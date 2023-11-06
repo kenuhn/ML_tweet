@@ -2,14 +2,18 @@ from flask import Flask, request, jsonify
 import joblib
 app = Flask(__name__)
 
-fModel2 = './mon_modele2.pkl'
+fModel2 = './mon_modele_test2.pkl'
 fModel1 = './mon_modele.pkl'
 
 
-isModel1 = False
+isModel1 = True
 
-model = joblib.load(fModel1) if isModel1 else joblib.load(fModel2) 
-vecteur = './mon_vecteur.pkl' if isModel1 else './mon_vecteur2.pkl'
+""" model = joblib.load(fModel1) if isModel1 else joblib.load(fModel2) 
+vecteur = './mon_vecteur.pkl' if isModel1 else './mon_vecteur_test2.pkl' """
+model1 = joblib.load(fModel1) 
+model2 = joblib.load(fModel2) 
+fVecteur1 = './mon_vecteur.pkl'
+fVecteur2 = './mon_vecteur_test2.pkl'
 
 def decodeurBinaire(valeurBinaire) : 
     arrType = [
@@ -31,28 +35,45 @@ def decodeurBinaire(valeurBinaire) :
         typologie = 'votre texte est conforme à ce que nous demandons'
     return typologie
 
-with open(vecteur, 'rb') as f:
-    vecteurizer = joblib.load(f) 
+with open(fVecteur1, 'rb') as f:
+    vecteurizer1 = joblib.load(f) 
 
+with open(fVecteur2, 'rb') as f:
+    vecteurizer2 = joblib.load(f) 
+    
+joblib.dump(vecteurizer1, fVecteur1)
 
-joblib.dump(vecteurizer, vecteur)
+joblib.dump(vecteurizer2, fVecteur2)
 
 # Route POST
 @app.route('/api/data', methods=['POST'])
 def post_data():
     data = request.get_json()
     nouvelle_phrase = data['message']
-    vecteur_entree = vecteurizer.transform([nouvelle_phrase])
-    prediction = model.predict(vecteur_entree)
+    vecteur_entree1 = vecteurizer1.transform([nouvelle_phrase])
+    prediction1 = model1.predict(vecteur_entree1) 
 
-    if isModel1 : 
-        valeurBinaire = str('{:06b}'.format(prediction[0]))[2:]
+    vecteur_entree2 = vecteurizer2.transform([nouvelle_phrase])
+    prediction2 = model2.predict(vecteur_entree2)
+
+    print(prediction1, prediction2)
+    value = 0
+    if (prediction1[0] != 0 and prediction2[0] != 0) : 
+        valeurBinaire = str('{:06b}'.format(prediction1[0]))[2:]
         typologie = decodeurBinaire(valeurBinaire)
-    else : 
-        typologie = " faites attention au propos que vous tenez, car ils sont inadapté" if prediction[0] == 1 else "vos propos sont approprié"
+        value = "1"
+    elif (prediction1[0] == 0 and prediction2[0] == 0) : 
+        typologie = "vos propos sont approprié"
+        value = "0"
+    elif (prediction1[0] != 0 and prediction2[0] == 0) :
+        typologie = "vos propos sont approprié"
+        value = "0"
+    elif (prediction1[0] == 0 and prediction2[0] != 0):
+        typologie = "vos propos sont approprié"
+        value = "0"
     
     if data:
-        return jsonify({'message':typologie})
+        return jsonify({'message':typologie, 'value': value})
     else:
         return jsonify({'message': 'Erreur : Aucune donnée POST n\'a été fournie.'}), 400
 

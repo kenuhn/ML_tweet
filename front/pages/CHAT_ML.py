@@ -2,6 +2,23 @@ import streamlit as st
 import random
 import time
 import requests
+import spacy
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import streamlit as st 
+import matplotlib.pyplot as plt
+from collections import Counter
+import warnings
+
+# Exemple de données
+
+# Création d'un DataFrame à partir des données
+
+
 st.write("# Welcome to the Chat talk with me👋")
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -20,7 +37,7 @@ if prompt := st.chat_input("What is up?"):
     api_url = "http://127.0.0.1:5000/api/data"
     api_data = {"message": prompt}
     response = requests.post(api_url, json=api_data, )
-    print(response)
+        
     # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -30,7 +47,7 @@ if prompt := st.chat_input("What is up?"):
         message_placeholder = st.empty()
         full_response = ""
         if response.status_code == 200:
-            assistant_response = response.json().get("message")
+            assistant_response = response.json().get("message")  
         else:
             assistant_response = "Sorry, I couldn't fetch a response from the API."
         

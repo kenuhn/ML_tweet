@@ -4,7 +4,7 @@ import time
 
 
 st.set_page_config(
-    page_title="Home",
+    page_title="HOME",
     page_icon="👋",
 )
 st.write("# IA pour la modération des commentaires! 👋")

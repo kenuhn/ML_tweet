@@ -7,6 +7,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st 
 import matplotlib.pyplot as plt
+from collections import Counter
+import warnings
 
 
 dfComment = pd.read_csv("./../train.csv")
@@ -21,6 +23,8 @@ dfCounts = pd.DataFrame(list(counts.items()))
 dfCounts.rename(columns={0:'natureOfcomment',1:'Frequence'}, inplace=True)
 
 st.markdown("<h1 style='text-align: center;'>Analyse de la donnée</h1>", unsafe_allow_html=True)
+
+
 
 @st.cache_data
 def showfig1():
@@ -87,11 +91,10 @@ dfMulticlassClean.drop(['del'],axis=1,inplace=True)
 
 
 
-
 @st.cache_data
 def showfig2():
     color_scale = 'Viridis'
-    fig2 = px.imshow(dfComment.corr(numeric_only=True),text_auto = True,width=900,height=600,color_continuous_scale=color_scale,title="MATRICE DE CORRELATION")
+    fig2 = px.imshow(dfComment[['toxic','severe_toxic','obscene','threat','insult','identity_hate' ]].corr(numeric_only=True),text_auto = True,width=900,height=600,color_continuous_scale=color_scale,title="MATRICE DE CORRELATION")
     fig2.update_layout(title_x=0)
     return fig2
 
@@ -107,14 +110,14 @@ st.plotly_chart(showfig2(), use_container_width = True)
      d'implémenter une ia capable de modérer les comentaires!
     ### Le code du graphique?
         @st.cache_data
-        def showfig3():
-            fig3 = px.bar(dfMulticlassClean,x=dfMulticlassClean['decimalOfmultiClass'],y=dfMulticlassClean['counts'],color=dfMulticlassClean['natureOfmultiClass'],width=900,height=600,title="LA FREQUENCE PAR MULTICLASS")
-            x_tickvals = dfMulticlassClean['decimalOfmultiClass']
-            fig3.update_xaxes(tickmode='array', tickvals=x_tickvals)
-            fig3.update_layout(title_x=0)
-            return fig3
-        #la frequence des multiclasses
-        st.plotly_chart(showfig3(), use_container_width = True)
+        def showfig2():
+            color_scale = 'Viridis'
+            fig2 = px.imshow(dfComment.corr(numeric_only=True),text_auto = True,width=900,height=600,color_continuous_scale=color_scale,title="MATRICE DE CORRELATION")
+            fig2.update_layout(title_x=0)
+            return fig2
+
+        #la matrice de correlation
+        st.plotly_chart(showfig2(), use_container_width = True)
 """
 
 
@@ -150,6 +153,27 @@ st.plotly_chart(showfig3(), use_container_width = True)
 """
 
 
+# Chargez le fichier HTML
+with open("/Users/kenuhnrimbert/Documents/ipssi_1er_anne/ml_project_1/front/pages/wordcloud_identity_hate.html", "r",encoding="UTF-8") as f:
+    html_content = f.read()
+    # Utilisez st.components.html pour afficher le contenu HTML
+    st.components.v1.html(html_content, height=600, width=800)
+    
+with open("/Users/kenuhnrimbert/Documents/ipssi_1er_anne/ml_project_1/front/pages/wordcloud_insult.html", "r",encoding="UTF-8") as f:
+    html_content = f.read()
+    # Utilisez st.components.html pour afficher le contenu HTML
+    st.components.v1.html(html_content, height=600, width=800)
+
+with open("/Users/kenuhnrimbert/Documents/ipssi_1er_anne/ml_project_1/front/pages/wordcloud_obscene.html", "r",encoding="UTF-8") as f:
+    html_content = f.read()
+    # Utilisez st.components.html pour afficher le contenu HTML
+    st.components.v1.html(html_content, height=600, width=800)
+
+with open("/Users/kenuhnrimbert/Documents/ipssi_1er_anne/ml_project_1/front/pages/wordcloud_toxic.html", "r",encoding="UTF-8") as f:
+    html_content = f.read()
+    # Utilisez st.components.html pour afficher le contenu HTML
+    st.components.v1.html(html_content, height=600, width=800)
+    
 # Exemple de données
 data = {
     'Modèle': ['Model Complexe', 'Model Binaire'],
@@ -216,6 +240,11 @@ with open('/Users/kenuhnrimbert/Documents/ipssi_1er_anne/ml_project_1/front/page
 
 # Affichage du graphique Plotly en tant que composant HTML
 st.components.v1.html(plotly_html, width=900, height=600)
+
+
+
+
+
 
 
 
